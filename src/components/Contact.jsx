@@ -7,11 +7,27 @@ export default function Contact() {
     service: '',
     message: '',
   });
+  const [formStatus, setFormStatus] = useState('idle'); // idle | sending | sent | error
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    alert('Message sent successfully!');
-    setFormData({ name: '', email: '', service: '', message: '' });
+    (async () => {
+      try {
+        setFormStatus('sending');
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || 'Failed to send');
+        setFormStatus('sent');
+        setFormData({ name: '', email: '', service: '', message: '' });
+      } catch (err) {
+        console.error(err);
+        setFormStatus('error');
+      }
+    })();
   };
 
   const handleChange = (e) => {
@@ -184,9 +200,9 @@ export default function Contact() {
                 </div>
 
                 <div className="col-12 mt-5">
-                  <button type="submit" className="btn btn-gradient w-100 py-3 rounded-pill fw-bold fs-5 hover-lift">
+                  <button type="submit" className="btn btn-gradient w-100 py-3 rounded-pill fw-bold fs-5 hover-lift" disabled={formStatus === 'sending'}>
                     <div className="d-flex align-items-center justify-content-center gap-2">
-                      Send Message
+                      {formStatus === 'sending' ? 'Sending...' : formStatus === 'sent' ? 'Sent ✓' : 'Send Message'}
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
                         <line x1="22" y1="2" x2="11" y2="13" />
                         <polygon points="22 2 15 22 11 13 2 9 22 2" />
@@ -194,6 +210,11 @@ export default function Contact() {
                     </div>
                   </button>
                 </div>
+                {formStatus === 'error' && (
+                  <div className="col-12">
+                    <div className="alert alert-danger">Failed to send message. Try again later.</div>
+                  </div>
+                )}
               </form>
             </div>
           </div>
