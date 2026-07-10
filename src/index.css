@@ -7,7 +7,8 @@
   --surface: #0b1220; /* surfaces for cards and panels */
   --muted-surface: rgba(255,255,255,0.03);
   --text-light: #e6eef8; /* high-contrast light text */
-  --muted-text: #9aa6b2;
+  --muted-text: #bcd3e6; /* brighter subtext for visibility */
+  --subtext: #bcd3e6; /* friendly alias for secondary text */
 }
 
 body {
@@ -63,6 +64,24 @@ section {
 }
 .nav-link-custom:hover {
   color: var(--primary);
+}
+
+/* Make muted/secondary/lead/small text more visible on dark backgrounds */
+.text-muted,
+.text-secondary,
+.lead,
+small,
+.small,
+.form-label,
+.text-muted a,
+.text-secondary a {
+  color: var(--subtext) !important;
+  opacity: 1 !important;
+}
+
+/* Slightly dim non-critical helper text but keep visible */
+.helper-text {
+  color: rgba(188,211,230,0.9);
 }
 
 /* Buttons */
