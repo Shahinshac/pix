@@ -19,8 +19,18 @@ export default function Contact() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData),
         });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || 'Failed to send');
+        if (!res.ok) {
+          // try to read text or json error from server
+          const text = await res.text().catch(() => null);
+          let errMsg = text || `Request failed with status ${res.status}`;
+          try {
+            const json = JSON.parse(text || 'null');
+            if (json && json.error) errMsg = json.error;
+          } catch (e) {}
+          throw new Error(errMsg);
+        }
+        // parse json if present
+        const data = await res.json().catch(() => null);
         setFormStatus('sent');
         setFormData({ name: '', email: '', service: '', message: '' });
       } catch (err) {
@@ -144,10 +154,12 @@ export default function Contact() {
 
               <form onSubmit={handleSubmit} className="row g-4">
                 <div className="col-md-6">
-                  <label className="form-label fw-medium text-muted">Your Name</label>
+                  <label htmlFor="name" className="form-label fw-medium text-muted">Your Name</label>
                   <input
+                    id="name"
                     type="text"
                     name="name"
+                    autoComplete="name"
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="John Doe"
@@ -156,10 +168,12 @@ export default function Contact() {
                   />
                 </div>
                 <div className="col-md-6">
-                  <label className="form-label fw-medium text-muted">Email Address</label>
+                  <label htmlFor="email" className="form-label fw-medium text-muted">Email Address</label>
                   <input
+                    id="email"
                     type="email"
                     name="email"
+                    autoComplete="email"
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="john@example.com"
@@ -169,9 +183,11 @@ export default function Contact() {
                 </div>
 
                 <div className="col-12">
-                  <label className="form-label fw-medium text-muted">Service Interested In</label>
+                  <label htmlFor="service" className="form-label fw-medium text-muted">Service Interested In</label>
                   <select
+                    id="service"
                     name="service"
+                    autoComplete="off"
                     value={formData.service}
                     onChange={handleChange}
                     className="form-select custom-input"
@@ -187,9 +203,11 @@ export default function Contact() {
                 </div>
 
                 <div className="col-12">
-                  <label className="form-label fw-medium text-muted">Your Message</label>
+                  <label htmlFor="message" className="form-label fw-medium text-muted">Your Message</label>
                   <textarea
+                    id="message"
                     name="message"
+                    autoComplete="off"
                     value={formData.message}
                     onChange={handleChange}
                     placeholder="Tell us about your project..."
