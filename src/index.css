@@ -170,3 +170,17 @@ small,
   box-shadow: 0 0 0 0.25rem rgba(139, 92, 246, 0.22);
   outline: none;
 }
+
+/* Ensure select text and dropdown options are visible on dark background */
+.form-select.custom-input {
+  color: var(--text-light);
+  background: rgba(255,255,255,0.03);
+  -webkit-text-fill-color: var(--text-light);
+}
+.form-select.custom-input option {
+  color: var(--text-light);
+  background: var(--surface);
+}
+.form-select.custom-input:focus {
+  color: var(--text-light);
+}
